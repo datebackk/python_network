@@ -1,14 +1,26 @@
 import json
 import socket
-import sys
 import threading
+
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 sock.setblocking(True)
-sock.connect(('localhost', 9090))
-print('Connected to server')
+sock.connect(('localhost', 80))
+
+
+msg = json.dumps({'server': 'chat_server'})
+sock.send(str(msg).encode())
+dist_port = int((sock.recv(1024)).decode())
+sock.close()
+
+sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+sock.setblocking(True)
+sock.connect(('localhost', dist_port))
+print(f'Connected to server')
 
 username = input('Enter yor username: ')
+msg = json.dumps({'username': username, 'message': 'init'})
+sock.send(str(msg).encode())
 
 
 def receive():
