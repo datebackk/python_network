@@ -18,7 +18,7 @@ sock.setblocking(True)
 sock.connect(('localhost', dist_port))
 print(f'Connected to server')
 
-username = input('Enter yor username: ')
+username = input('Введите имя пользователя: ')
 msg = json.dumps({'username': username, 'message': 'init'})
 sock.send(str(msg).encode())
 
