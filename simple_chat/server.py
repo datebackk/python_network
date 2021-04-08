@@ -20,6 +20,17 @@ class ChatServer:
         self.port = self.server.getsockname()[1]
         print(f'Сервер чата запущен на порту: {self.port}', file=sys.stdout)
 
+    def threading(self, func):
+        clientThread = threading.Thread(target=func)
+        clientThread.start()
+
+    def message_sending(self, message, address):
+        if message['message'] != 'init':
+            new_message = json.dumps({'username': self.clients[address], 'message': message['message']})
+
+            for client_addr in self.clients:
+                self.server.sendto(str(new_message).encode(), client_addr)
+
     def receive(self):
         while True:
             message, address = self.server.recvfrom(1024)
@@ -30,11 +41,7 @@ class ChatServer:
 
             self.clients.setdefault(address, message['username'])
 
-            if message['message'] != 'init':
-                new_message = json.dumps({'username': self.clients[address], 'message': message['message']})
-
-                for client_addr in self.clients:
-                    self.server.sendto(str(new_message).encode(), client_addr)
+            self.threading(self.message_sending(message, address))
 
 
 class ProxyServer:
