@@ -40,7 +40,10 @@ class ChatServer:
             message = json.loads(message.decode())
 
             self.clients.setdefault(address, message['username'])
-
+            chatHistory = open("history.txt", "a+")
+            chatHistory.writelines([f'{message["username"]} -> {message["message"]}\n'])
+            chatHistory.flush()
+            chatHistory.close()
             self.threading(self.message_sending(message, address))
 
 

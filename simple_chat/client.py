@@ -22,6 +22,13 @@ username = input('Введите имя пользователя: ')
 msg = json.dumps({'username': username, 'message': 'init'})
 sock.send(str(msg).encode())
 
+with open('history.txt', 'r') as f:
+    messages = f.read().splitlines()
+
+for message in messages:
+    print(message)
+print('Новые сообщения')
+
 
 def receive():
     while True:
