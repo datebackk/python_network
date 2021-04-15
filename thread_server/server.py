@@ -19,13 +19,27 @@ def listen_client(conn):
         print('Data from client accept:')
 
         msg = data.decode()
+        chatHistory = open("log.txt", "a+")
+        chatHistory.writelines([f'{data} \n'])
+        chatHistory.flush()
+        chatHistory.close()
+
         conn.send(data)
 
         print(msg)
 
 
-while True:
-    conn, addr = sock.accept()
-    print('Client connected')
-    print(addr)
-    threading.Thread(target=listen_client, args=(conn,)).start()
+def conn_accept(stop, stop1):
+    while not stop:
+        conn, addr = sock.accept()
+        print('Client connected')
+        print(addr)
+        threading.Thread(target=listen_client, args=(conn,)).start()
+
+
+def pause():
+    while True:
+        print('pause')
+
+
+cannAccept = threading.Thread(target=conn_accept, args=[False, False]).start()
