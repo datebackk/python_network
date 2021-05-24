@@ -1,0 +1,48 @@
+version: '3.7'
+services:
+  nginx:
+    container_name: nginx
+    restart: unless-stopped
+    build: ./nginx
+    volumes:
+      # NGINX Config
+      - ./nginx/nginx_dev.conf:/etc/nginx/nginx.conf
+      # Dev Crts
+      - ./nginx/dev_crts/localhost.crt:/etc/dev_crts/localhost.crt
+      - ./nginx/dev_crts/localhost.key:/etc/dev_crts/localhost.key
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - main_page
+    networks:
+      - app-network
+
+
+  main_page:
+    container_name: main_page
+    build: ./main_page
+    # command: gunicorn --worker-class eventlet -w 9 start:main_page -b 0.0.0.0:80    # Production start command
+    command: python start.py                                                    # Dev start command
+    restart: unless-stopped
+    environment:
+      FLASK_APP: start.py
+      DEBUG_MODE: $DEBUG_MODE
+      SECRET_KEY: $SECRET_KEY
+      SQLALCHEMY_DATABASE_URI: '${MYSQL_DRIVER}://${MYSQL_USER}:${MYSQL_PASSWORD}@mysql:${MYSQL_PORT}/${MYSQL_DATABASE}'
+      SQLALCHEMY_TRACK_MODIFICATIONS: $SQLALCHEMY_TRACK_MODIFICATIONS
+    ports:
+      - "80"
+      - "443"
+    volumes:
+      - ./main_page:/main_page
+    networks:
+      - app-network
+
+volumes:
+  db-data:
+    driver: local
+
+networks:
+  app-network:
+    driver: bridge
