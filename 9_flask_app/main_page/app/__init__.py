@@ -16,12 +16,14 @@ def create_app(config):
 
     db.init_app(app)
 
+
     with app.app_context():
         from app.blueprints.auth.routes import auth
         # from app.blueprints.main_page.routes import main_page
 
         app.register_blueprint(auth)
         # app.register_blueprint(main_page)
+        db.create_all()
 
     return app
 
