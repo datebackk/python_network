@@ -3,8 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <title>Hi from flask</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
 </head>
 <body>
-
+    <h1>Hi {{current_user.email}}</h1>
+    <p>Дата регистрации {{current_user.date_of_registration}}</p>
+    <a href="/logout">Выйти</a>
 </body>
 </html>

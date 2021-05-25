@@ -8,6 +8,9 @@ auth = Blueprint('auth', __name__, template_folder='templates/auth', static_fold
 
 login_manager = LoginManager()
 
+login_manager.login_view = "auth.login"
+login_manager.login_message = u"Пожалуйста авторизуйтесь чтобы получить доступ к этой странице"
+
 @auth.record_once
 def on_load(state):
     login_manager.init_app(state.app)
