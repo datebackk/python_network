@@ -2,7 +2,7 @@ from flask import Flask
 from app.config import Config
 from flask_wtf.csrf import CSRFProtect
 from app.database import db
-
+from app.api.api import api_manager
 
 csrf = CSRFProtect()
 
@@ -16,14 +16,13 @@ def create_app(config):
 
     db.init_app(app)
 
-
     with app.app_context():
         from app.blueprints.auth.routes import auth
-        # from app.blueprints.main_page.routes import main_page
 
         app.register_blueprint(auth)
-        # app.register_blueprint(main_page)
         db.create_all()
+
+        api_manager.init_app(app, flask_sqlalchemy_db=db)
 
     return app
 
