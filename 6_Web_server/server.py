@@ -12,17 +12,32 @@ def start():
         listen = int(settings[1].split(':')[1])
 
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     server.bind(('', port))
     server.listen(listen)
 
     while True:
         client, address = server.accept()
-        data = client.recv(1024).decode(UTF)
+        data = client.recv(1024)
+
+        try:
+            data = data.decode(UTF)
+        except:
+            try:
+                data = data.replace('"', "")
+            except:
+                pass
 
         log = open("log.txt", "a+")
-        log.writelines([f'Path: {data.split(" ")[1]} Time: {datetime.datetime.now()} Address: {address} \n'])
-        log.flush()
-        log.close()
+        try:
+            log.writelines([f'Path: {data.split(" ")[1]} Time: {datetime.datetime.now()} Address: {address} \n'])
+            log.flush()
+            log.close()
+        except IndexError:
+            log.writelines([f'Time: {datetime.datetime.now()} Address: {address} \n'])
+            log.flush()
+            log.close()
+            client.shutdown(socket.SHUT_WR)
 
         content = get_route(data)
         client.send(content)
@@ -38,7 +53,12 @@ def get_route(request):
     Server = 'Server: MyServer\r\n\r\n'
     ContentType = f'Content-Type: text/html; charset={UTF}\r\n'
 
-    path = request.split(' ')[1]
+    ForbiddenExtensions = ['js', 'css']
+
+    try:
+        path = request.split(' ')[1]
+    except IndexError:
+        return "error".encode(UTF)
     page = None
 
     if path == '/':
@@ -49,7 +69,14 @@ def get_route(request):
     elif path == '/protected':
         page = '/403.html'
     else:
-        page = '/404.html'
+        try:
+            extension = path.split('.')[1]
+            if extension in ForbiddenExtensions:
+                page = '/403.html'
+            else:
+                page = '/404.html'
+        except IndexError:
+            page = '/404.html'
 
     response = ''
     with open('pages' + page, 'rb') as file:
