@@ -17,8 +17,12 @@ def start():
 
     while True:
         client, address = server.accept()
-
         data = client.recv(1024).decode(UTF)
+
+        log = open("log.txt", "a+")
+        log.writelines([f'Path: {data.split(" ")[1]} Time: {datetime.datetime.now()} Address: {address} \n'])
+        log.flush()
+        log.close()
 
         content = get_route(data)
         client.send(content)
